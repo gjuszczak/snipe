@@ -1,0 +1,9 @@
+<div class="container mt-3 mb-5">
+    <div *ngIf="isAuthenticated$ | async; else elseBlock">
+        <p>User successfully loged in</p>
+    </div>
+
+    <ng-template #elseBlock>
+        <p>Login...</p>
+    </ng-template>
+</div>
