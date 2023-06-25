@@ -1,8 +1,6 @@
 ﻿using Snipe.App.Core.Queries;
-using Snipe.App.Features.Common.Interfaces;
+using Snipe.App.Features.Common.Services;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Snipe.App.Features.Redirections.Queries.GetRedirectionByName
 {

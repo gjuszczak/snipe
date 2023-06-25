@@ -1,9 +1,6 @@
 ﻿using Snipe.App.Core.Commands;
 using Snipe.App.Features.Backups.Services;
-using Snipe.App.Features.Common.Interfaces;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using Snipe.App.Features.Common.Services;
 
 namespace Snipe.App.Features.Backups.Commands.RestoreBackup
 {

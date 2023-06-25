@@ -1,7 +1,5 @@
 ﻿using Snipe.App.Core.Events;
-using Snipe.App.Features.Common.Interfaces;
-using System.Threading;
-using System.Threading.Tasks;
+using Snipe.App.Features.Common.Services;
 
 namespace Snipe.App.Features.Redirections.Events
 {

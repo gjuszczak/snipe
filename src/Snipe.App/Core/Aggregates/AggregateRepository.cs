@@ -60,7 +60,7 @@ namespace Snipe.App.Core.Aggregates
 
                 @event.Version = ++version;
                 @event.TimeStamp = DateTimeOffset.UtcNow;
-                @event.CorrelationId = _correlationIdProvider.GetCorrelationId();
+                @event.CorrelationId = _correlationIdProvider.GetCorrelationIdIfEmpty(@event.CorrelationId);
                 @event.EventId = await _eventStore.SaveAsync(@event, cancellationToken);
                 eventsToPublish.Add(@event);
             }

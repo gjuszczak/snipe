@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace Snipe.App.Features.Common.Interfaces
+﻿namespace Snipe.App.Features.Common.Services
 {
     public interface IEventsReplayService
     {

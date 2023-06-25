@@ -4,8 +4,8 @@ using Snipe.App.Core.Dispatchers;
 using Snipe.App.Core.Events;
 using Snipe.App.Core.Queries;
 using Snipe.App.Core.Services;
+using Snipe.App.Features.Common.Services;
 using Snipe.App.Features.Backups.Services;
-using Snipe.App.Features.Common.Interfaces;
 using Snipe.App.Features.EventLog.Services.DetailsProviding;
 using Snipe.Infrastructure.Persistence;
 using Snipe.Infrastructure.Persistence.App;
@@ -17,7 +17,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
+using Snipe.App.Features.Users.Services;
 
 namespace Snipe.Infrastructure
 {
@@ -44,10 +44,15 @@ namespace Snipe.Infrastructure
                 options.UseNpgsql(
                     config.GetConnectionString("Snipe"),
                     x => x.MigrationsHistoryTable("__EFMigrationsHistory", "app")));
+            services.AddDbContext<UsersDbContext>(options =>
+                options.UseNpgsql(
+                    config.GetConnectionString("Snipe"),
+                    x => x.MigrationsHistoryTable("__EFMigrationsHistory", "users")));
 
             services.AddScoped<IAuditDataEnricher, AuditDataEnricher>();
             services.AddScoped<IEventStorage, SqlEventStorage>();
             services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>());
+            services.AddScoped<IUsersDbContext>(provider => provider.GetService<UsersDbContext>());
 
             services.Scan(selector =>
             {

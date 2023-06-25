@@ -1,19 +1,19 @@
-﻿using System;
-
-namespace Snipe.App.Core.Services
+﻿namespace Snipe.App.Core.Services
 {
     public class CorrelationIdProvider : ICorrelationIdProvider
     {
-        private Guid _correlationId = Guid.NewGuid();
+        private readonly Guid _correlationId = Guid.NewGuid();
 
         public Guid GetCorrelationId()
         {
             return _correlationId;
         }
 
-        public void SetCorrelationId(Guid correlationId)
+        public Guid GetCorrelationIdIfEmpty(Guid existingCorelationId)
         {
-            _correlationId = correlationId;
+            if (existingCorelationId == Guid.Empty)
+                return _correlationId;
+            return existingCorelationId;
         }
     }
 }

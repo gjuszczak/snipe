@@ -2,10 +2,7 @@
 using Snipe.App.Core.Queries;
 using Snipe.App.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.Concurrent;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Snipe.App.Core.Dispatchers
 {
@@ -23,7 +20,7 @@ namespace Snipe.App.Core.Dispatchers
 
         public async Task<Guid> DispatchAsync(ICommand command, CancellationToken cancellationToken = default)
         {
-            _correlationIdProvider.SetCorrelationId(command.CorrelationId);
+            command.CorrelationId = _correlationIdProvider.GetCorrelationIdIfEmpty(command.CorrelationId);
             var commandType = command.GetType();
             var commandDispatchWrapper = (IDispatchWrapper<Guid>)_dispatchWrappers.GetOrAdd(commandType,
                 commandType => CreateDispatchWrapper<Guid>(

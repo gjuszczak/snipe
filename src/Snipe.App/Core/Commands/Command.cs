@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Snipe.App.Core.Commands
+﻿namespace Snipe.App.Core.Commands
 {
     public abstract class Command : ICommand
     {
@@ -11,7 +9,7 @@ namespace Snipe.App.Core.Commands
 		protected Command()
         {
 			Id = Guid.NewGuid();
-			CorrelationId = Guid.NewGuid();
+			CorrelationId = Guid.Empty;
 			ExpectedVersion = 1;
 		}
 	}

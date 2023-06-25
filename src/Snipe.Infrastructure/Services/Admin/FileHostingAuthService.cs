@@ -1,4 +1,4 @@
-﻿using Snipe.App.Features.Common.Interfaces;
+﻿using Snipe.App.Features.Common.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;

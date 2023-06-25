@@ -1,20 +1,19 @@
-﻿using Snipe.App.Features.Common.Services;
-using Snipe.App.Features.Redirections.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Reflection;
 using Snipe.App.Features.Users.Entities;
+using Snipe.App.Features.Users.Services;
 
 namespace Snipe.Infrastructure.Persistence.App
 {
-    // Add-Migration Initial -c AppDbContext -o Persistence/App/Migrations
+    // Add-Migration Initial -c UsersDbContext -o Persistence/Users/Migrations
     // docker run --name postgresdb -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres:15-alpine
     // docker run --name pgadmin4 -p 8080:80 -e 'PGADMIN_DEFAULT_EMAIL=admin@admin.com' -e 'PGADMIN_DEFAULT_PASSWORD=admin' -d dpage/pgadmin4
-    public class AppDbContext : DbContext, IAppDbContext
+    public class UsersDbContext : DbContext, IUsersDbContext
     {
         private readonly IAuditDataEnricher _auditDataEnricher;
 
-        public AppDbContext(
+        public UsersDbContext(
             DbContextOptions<AppDbContext> options,
             IAuditDataEnricher auditDataEnricher)
             : base(options) 
@@ -22,7 +21,6 @@ namespace Snipe.Infrastructure.Persistence.App
             _auditDataEnricher = auditDataEnricher;
         }
 
-        public DbSet<RedirectionEntity> Redirections { get; set; }
         public DbSet<UserEntity> Users { get; set; }
 
 
@@ -34,8 +32,8 @@ namespace Snipe.Infrastructure.Persistence.App
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.HasDefaultSchema("app");
-            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly(), x => x.Namespace.Contains("App"));
+            builder.HasDefaultSchema("Users");
+            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly(), x => x.Namespace.Contains("Users"));
             base.OnModelCreating(builder);
         }
 

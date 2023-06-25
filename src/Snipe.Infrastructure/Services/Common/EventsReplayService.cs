@@ -1,5 +1,5 @@
 ﻿using Snipe.App.Core.Events;
-using Snipe.App.Features.Common.Interfaces;
+using Snipe.App.Features.Common.Services;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;

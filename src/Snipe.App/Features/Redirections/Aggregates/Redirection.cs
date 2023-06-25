@@ -1,7 +1,6 @@
 ﻿using Snipe.App.Core.Aggregates;
 using Snipe.App.Features.Redirections.Events;
 using Snipe.App.Features.Redirections.Exceptions;
-using System;
 
 namespace Snipe.App.Features.Redirections.Aggregates
 {
@@ -20,8 +19,7 @@ namespace Snipe.App.Features.Redirections.Aggregates
 
         public Redirection(Guid aggregateId, string name, Uri url) : this()
         {
-            AggregateId = aggregateId;
-            ApplyEvent(new RedirectionCreated(name, url));
+            ApplyInitEvent(aggregateId, new RedirectionCreated(name, url));
         }
 
         public void Edit(string name, Uri url)

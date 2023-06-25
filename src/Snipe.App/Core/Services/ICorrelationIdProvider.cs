@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace Snipe.App.Core.Services
+﻿namespace Snipe.App.Core.Services
 {
     public interface ICorrelationIdProvider
     {
-        void SetCorrelationId(Guid correlationId);
+        Guid GetCorrelationIdIfEmpty(Guid existingCorelationId);
         Guid GetCorrelationId();
     }
 }

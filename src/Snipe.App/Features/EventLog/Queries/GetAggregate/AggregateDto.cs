@@ -1,6 +1,5 @@
 ﻿using Snipe.App.Core.Aggregates;
 using Snipe.App.Features.EventLog.Services.DetailsProviding;
-using System;
 
 namespace Snipe.App.Features.EventLog.Qureies.GetAggregate
 {

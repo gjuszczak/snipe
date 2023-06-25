@@ -1,8 +1,5 @@
 ﻿using Snipe.App.Core.Commands;
 using Snipe.App.Features.Backups.Services;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Snipe.App.Features.Backups.Commands.CreateBackup
 {

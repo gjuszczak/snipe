@@ -1,5 +1,5 @@
 using Snipe.App.Core.Serialization;
-using Snipe.App.Features.Common.Interfaces;
+using Snipe.App.Features.Common.Services;
 using Snipe.Infrastructure;
 using Snipe.Web;
 using Snipe.Web.Configuration;

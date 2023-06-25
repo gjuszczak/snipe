@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Snipe.App.Features.Common.Interfaces
+namespace Snipe.App.Features.Common.Services
 {
     public interface IAppDbContext
     {

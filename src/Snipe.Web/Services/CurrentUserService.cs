@@ -1,4 +1,4 @@
-﻿using Snipe.App.Features.Common.Interfaces;
+﻿using Snipe.App.Features.Common.Services;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 
