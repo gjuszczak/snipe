@@ -9,20 +9,48 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Snipe.App.Features.Users.Services;
+using Microsoft.Extensions.Options;
 
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<ClientConfiguration>(builder.Configuration.GetSection("ClientConfig"));
 builder.Services.Configure<AzureAdConfiguration>(builder.Configuration.GetSection("AzureAd"));
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.Configure<UsersFeatureConfiguration>(builder.Configuration.GetSection("UsersFeature"));
 builder.Services.AddScoped<IUserInfoProvider, UserInfoProvider>();
+builder.Services.AddScoped<IHttpContextDetails, HttpContextDetails>();
+builder.Services.AddTransient<IUsersFeatureConfiguration>(provider => provider.GetService<IOptions<UsersFeatureConfiguration>>().Value);
 
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Snipe API", Version = "v1" });
     c.DescribeAllParametersInCamelCase();
+    c.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme()
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "bearerAuth"
+                    }
+                },
+                Array.Empty<string>()
+        }
+    });
 });
 
 builder.Services.AddSnipeAuth(builder.Configuration);

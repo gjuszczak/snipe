@@ -4,7 +4,6 @@ import { Store } from '@ngxs/store';
 import { NgcCookieConsentService } from 'ngx-cookieconsent';
 import { PrimeNGConfig } from 'primeng/api';
 import { ApiConfiguration } from './api/api-configuration';
-import { AuthService } from './core/services/auth.service';
 import { ConfigureNavigation } from './core/state/core.actions';
 import { UserRole } from './core/state/core.state';
 
@@ -18,7 +17,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly store: Store,
-    private authService: AuthService,
     private apiConfiguration: ApiConfiguration,
     private ccService: NgcCookieConsentService,
     private primengConfig: PrimeNGConfig,
@@ -27,7 +25,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.configureAuthentication();
     this.configurePrimeNg();
     this.configureApi();
     this.configureNavigation();
@@ -36,10 +33,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe());
-  }
-
-  configureAuthentication() {
-    this.subscriptions.push(this.authService.init());
   }
 
   configurePrimeNg() {
@@ -57,7 +50,7 @@ export class AppComponent implements OnInit, OnDestroy {
         items: [
           { label: 'Homepage', icon: 'pi-home', route: '/', routeExact: true },
           { label: 'Privacy Policy', icon: 'pi-info-circle', route: '/privacy-policy', routeExact: true },
-          { label: 'Login', icon: 'pi-sign-in', route: '/login', routeExact: true },
+          { label: 'Sign In', icon: 'pi-sign-in', route: '/sign-in', routeExact: true },
         ]
       },
       {

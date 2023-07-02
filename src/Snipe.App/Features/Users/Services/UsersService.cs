@@ -1,81 +1,52 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Snipe.App.Features.Users.Entities;
-using Snipe.App.Features.Users.Models;
+﻿using Snipe.App.Features.Users.Entities;
 
 namespace Snipe.App.Features.Users.Services
 {
-    public class UsersService
+    public class UsersService : IUsersService
     {
-        private readonly IUsersDbContext _context;
+        private readonly IUsersRepository _usersRepository;
         private readonly IPasswordHasher _passwordHasher;
-        private readonly IAuthTokenGenerator _tokenGenerator;
+        private readonly IEmailVerificationTotpProvider _emailVerificationTotpProvider;
 
-        public UsersService(IUsersDbContext context, IPasswordHasher passwordHasher, IAuthTokenGenerator tokenGenerator)
+        public UsersService(
+            IUsersRepository usersRepository,
+            IPasswordHasher passwordHasher,
+            IEmailVerificationTotpProvider emailVerificationTotpProvider)
         {
-            _context = context;
+            _usersRepository = usersRepository;
             _passwordHasher = passwordHasher;
-            _tokenGenerator = tokenGenerator;
+            _emailVerificationTotpProvider = emailVerificationTotpProvider;
         }
 
-        public async Task<SignInResult> SignIn(string email, string password, CancellationToken cancellationToken)
+        public async Task CreateUserAsync(string email, string password, string emailVerificationCode, CancellationToken cancellationToken)
         {
-            var userEntity = await _context.Users.SingleOrDefaultAsync(x => x.Email == email, cancellationToken: cancellationToken);
-
-            var isLockedOut = userEntity?.LockoutExpiration != null
-                    && userEntity.LockoutExpiration >= DateTime.Now;
-
-            var isPasswordCorrect = userEntity != null
-                && _passwordHasher.Verify(password, userEntity.PasswordHash);
-
-            if (userEntity != null && !isLockedOut && isPasswordCorrect)
+            var isEmailVerified = _emailVerificationTotpProvider.ValidateCode(email, emailVerificationCode);
+            if (!isEmailVerified)
             {
-                return await SignInSuccess(userEntity, cancellationToken);
+                return;
             }
 
-            return await SignInFail(userEntity, isLockedOut, isPasswordCorrect, cancellationToken);
-        }
-
-        private async Task<SignInResult> SignInSuccess(UserEntity userEntity, CancellationToken cancellationToken)
-        {
-            var accessToken = _tokenGenerator.GenerateAccessToken(userEntity.Id, userEntity.Email);
-            var refreshToken = _tokenGenerator.GenerateRefreshToken();
-
-            return new SignInResult
+            var userAlreadyExists = (await _usersRepository.GetByEmailAsync(email, cancellationToken)) != null;
+            if (userAlreadyExists)
             {
-                Success = true,
-                UserId = userEntity.Id,
-            };
-        }
-
-
-        private async Task<SignInResult> SignInFail(UserEntity userEntity, bool isLockedOut, bool isPasswordCorrect, CancellationToken cancellationToken)
-        {
-            if (userEntity == null)
-            {
-                return new SignInResult
-                {
-                    Success = false,
-                    FailReason = SignInFailReason.InvalidEmail
-                };
+                return;
             }
 
-            if (isLockedOut)
+            var passwordHash = _passwordHasher.Hash(password);
+            _usersRepository.AddUser(new UserEntity
             {
-                return new SignInResult
-                {
-                    Success = false,
-                    FailReason = SignInFailReason.UserLockedOut,
-                    LockoutExpiration = userEntity.LockoutExpiration,
-                    UserId = userEntity.Id
-                };
-            }
+                Id = Guid.NewGuid(),
+                Email = email,
+                NormalizedEmail = email.ToUpperInvariant(),
+                PasswordHash = passwordHash,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                ConcurrencyStamp = Guid.NewGuid().ToString(),
+                AccessFailedCount = 0,
+                LockoutEnabled = true,
+                LockoutExpiration = null
+            });
 
-            return new SignInResult
-            {
-                Success = false,
-                FailReason = SignInFailReason.InvalidPassword,
-                UserId = userEntity.Id
-            };
+            await _usersRepository.SaveChangesAsync(cancellationToken);
         }
     }
 }

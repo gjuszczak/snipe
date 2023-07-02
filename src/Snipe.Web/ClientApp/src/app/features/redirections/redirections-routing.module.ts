@@ -1,10 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { MsalGuard } from '@azure/msal-angular';
 import { RedirectionsComponent } from './redirections/redirections.component';
 
 const routes: Routes = [
-  { path: 'admin/redirections', component: RedirectionsComponent, pathMatch: 'full', canActivate: [MsalGuard] },
+  { path: 'admin/redirections', component: RedirectionsComponent, pathMatch: 'full' },
 ];
 
 @NgModule({

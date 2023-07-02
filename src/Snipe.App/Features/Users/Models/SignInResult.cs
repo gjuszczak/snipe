@@ -6,5 +6,7 @@
         public Guid? UserId { get; set; }
         public SignInFailReason? FailReason { get; set; }
         public DateTime? LockoutExpiration { get; internal set; }
+        public string? AccessToken { get; set; }
+        public string? RefreshToken { get; set; }
     }
 }

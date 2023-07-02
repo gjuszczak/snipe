@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using System.Text;
+using System.Data;
 
 namespace Snipe.Web
 {
@@ -30,43 +32,17 @@ namespace Snipe.Web
 
         public static void AddSnipeAuth(this IServiceCollection services, IConfiguration config)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
             {
-                var azureAd = config.GetSection("AzureAd").Get<AzureAdConfiguration>();
-                var roles = config.GetSection("Roles").Get<RolesConfiguration>();
-                var issuer = azureAd.Instance + azureAd.TenantId + "/v2.0";
-                options.Authority = issuer;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
+                opt.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidAudiences = new[] { azureAd.ClientId },
-                    ValidIssuers = new[] { issuer },
-                };
-
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        var accessToken = context.Request.Query["access_token"];
-                        var path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
-                        {
-                            context.Token = accessToken;
-                        }
-                        return Task.CompletedTask;
-                    },
-                    OnTokenValidated = ctx =>
-                    {
-                        var username = ctx.Principal.FindFirstValue("preferred_username");
-                        var role = (roles?.Admin?.Contains(username) ?? false) ? "admin" : "guest";
-                        var appClaims = new[]
-                        {
-                            new Claim(ClaimTypes.Name, username),
-                            new Claim(ClaimTypes.Role, role)
-                        };
-                        ctx.Principal.AddIdentity(new ClaimsIdentity(appClaims));
-                        return Task.CompletedTask;
-                    }
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(config["UsersFeature:Secret"])),
+                    ClockSkew = TimeSpan.Zero,
                 };
             });
 

@@ -4,13 +4,12 @@ import { NgModule, ModuleWithProviders, SkipSelf, Optional } from '@angular/core
 import { HttpClient } from '@angular/common/http';
 import { ApiConfiguration, ApiConfigurationParams } from './api-configuration';
 
+import { AuthService } from './services/auth.service';
 import { BackupsService } from './services/backups.service';
 import { ClientConfigService } from './services/client-config.service';
 import { EventLogService } from './services/event-log.service';
-import { HomeBoxService } from './services/home-box.service';
 import { RedirectionsService } from './services/redirections.service';
 import { RedirectToService } from './services/redirect-to.service';
-import { UserService } from './services/user.service';
 
 /**
  * Module that provides all services and configuration.
@@ -20,13 +19,12 @@ import { UserService } from './services/user.service';
   exports: [],
   declarations: [],
   providers: [
+    AuthService,
     BackupsService,
     ClientConfigService,
     EventLogService,
-    HomeBoxService,
     RedirectionsService,
     RedirectToService,
-    UserService,
     ApiConfiguration
   ],
 })

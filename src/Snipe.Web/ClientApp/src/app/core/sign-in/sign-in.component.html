@@ -1,0 +1,27 @@
+<div class="container mt-3 mb-5 mx-auto sign-in-box">
+    <p-card styleClass="mt-3" header="Sign In">
+        <p-progressBar *ngIf="loading" mode="indeterminate"></p-progressBar>
+        <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="flex flex-column gap-2 mt-4 mb-4">
+                <label for="email">Email</label>
+                <input type="text" pInputText id="email" formControlName="email" class="p-inputtext-lg w-full"
+                    aria-describedby="email-help" #autofocus />
+                <small id="name-help">Enter the email.</small>
+            </div>
+            <div class="flex flex-column gap-2 mb-4">
+                <label htmlFor="password">Password</label>
+                <p-password [toggleMask]="true" [feedback]="false" inputId="password" formControlName="password"
+                    class="p-inputtext-lg " styleClass="w-full" inputStyleClass="w-full">
+                </p-password>
+                <small id="password-help">Enter the password.</small>
+            </div>
+            <div *ngIf="error">
+                <p>Error: {{error}}</p>
+            </div>
+            <div class="flex justify-content-end gap-2">
+                <button pButton type="submit" icon="pi pi-sign-in" class="p-button-outlined p-button-lg"
+                    label="Sign In" [disabled]="loading"></button>
+            </div>
+        </form>
+    </p-card>
+</div>

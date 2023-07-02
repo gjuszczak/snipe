@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { BackendDetails } from 'src/app/api/models';
-import { AuthService } from '../services/auth.service';
+import { TokenStoreService } from '../services/token-store.service';
 
 @Component({
   selector: 'app-footer',

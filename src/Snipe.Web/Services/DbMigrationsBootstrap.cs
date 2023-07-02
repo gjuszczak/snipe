@@ -1,5 +1,6 @@
 ﻿using Snipe.Infrastructure.Persistence.App;
 using Snipe.Infrastructure.Persistence.Events;
+using Snipe.Infrastructure.Persistence.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Snipe.Web.Services
@@ -22,6 +23,9 @@ namespace Snipe.Web.Services
 
             var appDbContext = scope.ServiceProvider.GetService<AppDbContext>();
             await appDbContext.Database.MigrateAsync(cancellationToken);
+
+            var usersDbContext = scope.ServiceProvider.GetService<UsersDbContext>();
+            await usersDbContext.Database.MigrateAsync(cancellationToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

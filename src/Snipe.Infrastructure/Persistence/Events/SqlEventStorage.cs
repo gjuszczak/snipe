@@ -1,11 +1,6 @@
 ﻿using Snipe.App.Core.Events;
 using Snipe.Infrastructure.Persistence.Events;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Snipe.Infrastructure.Persistence
 {

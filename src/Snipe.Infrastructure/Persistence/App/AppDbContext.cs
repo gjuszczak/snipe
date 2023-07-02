@@ -3,7 +3,6 @@ using Snipe.App.Features.Redirections.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Reflection;
-using Snipe.App.Features.Users.Entities;
 
 namespace Snipe.Infrastructure.Persistence.App
 {
@@ -23,8 +22,6 @@ namespace Snipe.Infrastructure.Persistence.App
         }
 
         public DbSet<RedirectionEntity> Redirections { get; set; }
-        public DbSet<UserEntity> Users { get; set; }
-
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {

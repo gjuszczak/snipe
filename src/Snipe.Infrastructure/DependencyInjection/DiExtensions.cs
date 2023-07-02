@@ -7,9 +7,11 @@ using Snipe.App.Core.Services;
 using Snipe.App.Features.Common.Services;
 using Snipe.App.Features.Backups.Services;
 using Snipe.App.Features.EventLog.Services.DetailsProviding;
+using Snipe.App.Features.Users.Services;
 using Snipe.Infrastructure.Persistence;
 using Snipe.Infrastructure.Persistence.App;
 using Snipe.Infrastructure.Persistence.Events;
+using Snipe.Infrastructure.Persistence.Users;
 using Snipe.Infrastructure.Services.Admin;
 using Snipe.Infrastructure.Services.Common;
 using Snipe.Infrastructure.Services.Redirections;
@@ -17,7 +19,6 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Snipe.App.Features.Users.Services;
 
 namespace Snipe.Infrastructure
 {
@@ -80,6 +81,17 @@ namespace Snipe.Infrastructure
             services.AddScoped<IBackupService, BackupService>();
             services.AddScoped<IBackupFileService, BackupFileService>();
             services.AddScoped<ICachedRedirectionsService, CachedRedirectionsService>();
+
+            services.AddSingleton<IAccessTokenGenerator, AccessTokenGenerator>();
+            services.AddSingleton<IEmailVerificationSender, EmailVerificationSender>();
+            services.AddSingleton<IEmailVerificationTotpProvider, EmailVerificationTotpProvider>();
+            services.AddSingleton<ITotpProvider, TotpProvider>();
+            services.AddSingleton<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<IActivityLogGenerator, ActivityLogGenerator>();
+            services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
+            services.AddScoped<ISignInService, SignInService>();
+            services.AddScoped<IUsersRepository, UsersRepository>();
+            services.AddScoped<IUsersService, UsersService>();
 
             services.AddHttpClient<IFileHostingService, FileHostingService>(c =>
             {

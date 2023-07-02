@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { ConfigureNavigation, ToggleNavigationSideBar, UserRoleReceived, UserSignedIn, UserSignedOut } from './core.actions';
 import { patch } from '@ngxs/store/operators';
-import { UserService } from 'src/app/api/services';
 import { catchError, mergeMap } from 'rxjs';
+import { AuthService } from 'src/app/api/services/auth.service';
 
 export interface NavigationItem {
     label: string;
@@ -62,7 +62,7 @@ export const coreStateDefaults: CoreStateModel = {
 export class CoreState {
 
     constructor(
-        private userService: UserService
+        private authService: AuthService
     ) { }
 
     @Selector()
@@ -90,7 +90,6 @@ export class CoreState {
         return state.user.isAuthenticated;
     }
 
-
     @Action(ToggleNavigationSideBar)
     toggleNavigationSideBar(ctx: StateContext<CoreStateModel>, { visible }: ToggleNavigationSideBar) {
         const state = ctx.getState();
@@ -117,7 +116,7 @@ export class CoreState {
     userSignedIn(ctx: StateContext<CoreStateModel>, { name, userName }: UserSignedIn) {
         ctx.setState(this.setUser(true, name, userName, UserRole.None));
 
-        return this.userService.apiUserGet$Json().pipe(
+        return this.authService.apiAuthUserGet$Json().pipe(
             mergeMap(user => ctx.dispatch(new UserRoleReceived(user.role ? user.role : undefined))),
             catchError(e => {
                 console.error(`Unable to get user roles. ${e}`);

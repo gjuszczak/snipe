@@ -147,10 +147,6 @@ body {
     }
   }
 
-  .w-100 {
-    width: 100%;
-  }
-
   .home-jumbo {
     padding-top: 3.7rem;
     padding-bottom: 3.7rem;
@@ -169,6 +165,14 @@ body {
     font-size: 1.5rem;
     font-weight: normal;
     padding: 0;
+  }
+
+  .sign-in-box {
+    max-width: 600px;
+
+    .p-progressbar {
+      height: 6px;
+    }
   }
 
   .rounded-img {
