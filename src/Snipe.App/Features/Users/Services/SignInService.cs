@@ -6,6 +6,7 @@ namespace Snipe.App.Features.Users.Services
     public class SignInService : ISignInService
     {
         private readonly IUsersRepository _usersRepository;
+        private readonly IUserLockoutService _userLockoutService;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IAccessTokenGenerator _accessTokenGenerator;
         private readonly IRefreshTokenGenerator _refreshTokenGenerator;
@@ -13,12 +14,14 @@ namespace Snipe.App.Features.Users.Services
 
         public SignInService(
             IUsersRepository usersRepository,
+            IUserLockoutService userLockoutService,
             IPasswordHasher passwordHasher,
             IAccessTokenGenerator accessTokenGenerator,
             IRefreshTokenGenerator refreshTokenGenerator,
             IActivityLogGenerator activityLogGenerator)
         {
             _usersRepository = usersRepository;
+            _userLockoutService = userLockoutService;
             _passwordHasher = passwordHasher;
             _accessTokenGenerator = accessTokenGenerator;
             _refreshTokenGenerator = refreshTokenGenerator;
@@ -29,8 +32,8 @@ namespace Snipe.App.Features.Users.Services
         {
             var userEntity = await _usersRepository.GetByEmailAsync(email, cancellationToken);
 
-            var isLockedOut = userEntity?.LockoutExpiration != null
-                    && userEntity.LockoutExpiration >= DateTime.Now;
+            var isLockedOut = userEntity != null
+                && _userLockoutService.IsLockedOut(userEntity);
 
             var isPasswordCorrect = userEntity != null
                 && _passwordHasher.Verify(password, userEntity.PasswordHash);
@@ -40,7 +43,7 @@ namespace Snipe.App.Features.Users.Services
                 return await SignInSuccess(userEntity, cancellationToken);
             }
 
-            return await SignInFailure(userEntity, isLockedOut, cancellationToken);
+            return await SignInFailure(userEntity, cancellationToken);
         }
 
         private async Task<SignInResult> SignInSuccess(UserEntity userEntity, CancellationToken cancellationToken)
@@ -55,48 +58,30 @@ namespace Snipe.App.Features.Users.Services
 
             await _usersRepository.SaveChangesAsync(cancellationToken);
 
-            return new SignInResult
-            {
-                Success = true,
-                UserId = userEntity.Id,
-                AccessToken = accessToken,
-                RefreshToken = refreshToken.Token
-            };
+            return SignInResult.SignedIn(new(accessToken, refreshToken.Token));
         }
 
-        private async Task<SignInResult> SignInFailure(UserEntity? userEntity, bool isLockedOut, CancellationToken cancellationToken)
+        private async Task<SignInResult> SignInFailure(UserEntity? userEntity, CancellationToken cancellationToken)
         {
             if (userEntity == null)
             {
-                return new SignInResult
-                {
-                    Success = false,
-                    FailReason = SignInFailReason.InvalidEmail
-                };
+                return SignInResult.InvalidEmail();
             }
 
             var activityLog = _activityLogGenerator.SignInFailure(userEntity.Id);
             _usersRepository.AddActivityLog(activityLog);
 
+            _userLockoutService.IncrementFailCount(userEntity);
+
             await _usersRepository.SaveChangesAsync(cancellationToken);
 
-            if (isLockedOut)
+            var lockoutExpiration = _userLockoutService.GetLockoutExpiration(userEntity);
+            if (lockoutExpiration.HasValue)
             {
-                return new SignInResult
-                {
-                    Success = false,
-                    FailReason = SignInFailReason.UserLockedOut,
-                    LockoutExpiration = userEntity.LockoutExpiration,
-                    UserId = userEntity.Id
-                };
+                return SignInResult.UserLockedOut(lockoutExpiration.Value);
             }
 
-            return new SignInResult
-            {
-                Success = false,
-                FailReason = SignInFailReason.InvalidPassword,
-                UserId = userEntity.Id
-            };
+            return SignInResult.InvalidPassword();
         }
 
         public async Task<SignInWithRefreshTokenResult> SignInWithRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken)
